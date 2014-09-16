@@ -26,6 +26,11 @@ describe("an Environment", function () {
 	}
 
 	function describeRestoreFunction (context) {
+		it("returns a 'restore' function", function (done) {
+			expect(context.result, "type").to.be.a("function");
+			done();
+		});
+
 		describe("and invoking the restore function", function () {
 			var restore;
 
@@ -40,7 +45,7 @@ describe("an Environment", function () {
 			});
 
 			it("undoes the set operation", function (done) {
-				expect(environment.get("foo"), "value").to.equal(context.originalValue);
+				expect(environment.get(context.name), "value").to.equal(context.originalValue);
 				done();
 			});
 		});
@@ -48,12 +53,7 @@ describe("an Environment", function () {
 
 	function describeSet (context) {
 		it("sets the value", function (done) {
-			expect(environment.get("foo"), "value").to.equal("bar");
-			done();
-		});
-
-		it("returns a 'restore' function", function (done) {
-			expect(context.result, "type").to.be.a("function");
+			expect(environment.get(context.name), "value").to.equal(context.value);
 			done();
 		});
 
@@ -108,14 +108,18 @@ describe("an Environment", function () {
 	});
 
 	describe("setting a variable that is not defined", function () {
-		var context = {};
+		var context = {
+			name  : "foo",
+			value : "bar"
+		};
+
 		var restore;
 
 		before(function (done) {
 			restore = set("FOO");
 
-			context.originalValue = environment.get("foo");
-			context.result        = environment.set("foo", "bar");
+			context.originalValue = environment.get(context.name);
+			context.result        = environment.set(context.name, context.value);
 			done();
 		});
 
@@ -128,14 +132,18 @@ describe("an Environment", function () {
 	});
 
 	describe("setting a variable that is already defined", function () {
-		var context = {};
+		var context = {
+			name  : "foo",
+			value : "bar"
+		};
+
 		var restore;
 
 		before(function (done) {
 			restore = set("FOO", "bar");
 
-			context.originalValue = environment.get("foo");
-			context.result        = environment.set("foo", "bar");
+			context.originalValue = environment.get(context.name);
+			context.result        = environment.set(context.name, context.value);
 			done();
 		});
 
