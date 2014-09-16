@@ -24,6 +24,12 @@ describe("an Environment", function () {
 	}
 
 	function describeDelete (context) {
+		before(function (done) {
+			context.originalValue = context.environment.get(context.name);
+			context.result        = context.environment.delete(context.name);
+			done();
+		});
+
 		it("unsets the value", function (done) {
 			expect(context.environment.get(context.name), "value").to.be.undefined;
 			done();
@@ -61,6 +67,12 @@ describe("an Environment", function () {
 	}
 
 	function describeSet (context) {
+		before(function (done) {
+			context.originalValue = context.environment.get(context.name);
+			context.result        = context.environment.set(context.name, context.value);
+			done();
+		});
+
 		it("sets the value", function (done) {
 			expect(context.environment.get(context.name), "value").to.equal(context.value);
 			done();
@@ -126,9 +138,6 @@ describe("an Environment", function () {
 
 		before(function (done) {
 			restore = set("FOO");
-
-			context.originalValue = context.environment.get(context.name);
-			context.result        = context.environment.set(context.name, context.value);
 			done();
 		});
 
@@ -151,9 +160,6 @@ describe("an Environment", function () {
 
 		before(function (done) {
 			restore = set("FOO", "bar");
-
-			context.originalValue = context.environment.get(context.name);
-			context.result        = context.environment.set(context.name, context.value);
 			done();
 		});
 
@@ -175,9 +181,6 @@ describe("an Environment", function () {
 
 		before(function (done) {
 			restore = set("FOO");
-
-			context.originalValue = context.environment.get(context.name);
-			context.result        = context.environment.delete(context.name);
 			done();
 		});
 
@@ -199,9 +202,6 @@ describe("an Environment", function () {
 
 		before(function (done) {
 			restore = set("FOO", "foo");
-
-			context.originalValue = context.environment.get(context.name);
-			context.result        = context.environment.delete(context.name);
 			done();
 		});
 
