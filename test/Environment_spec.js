@@ -10,8 +10,6 @@ var expect   = Lab.expect;
 var it       = script.it;
 
 describe("an Environment", function () {
-	var environment;
-
 	function set (name, value) {
 		var previous = process.env[name];
 
@@ -23,6 +21,15 @@ describe("an Environment", function () {
 		}
 
 		return set.bind(null, name, previous);
+	}
+
+	function describeDelete (context) {
+		it("unsets the value", function (done) {
+			expect(context.environment.get(context.name), "value").to.be.undefined;
+			done();
+		});
+
+		describeRestoreFunction(context);
 	}
 
 	function describeRestoreFunction (context) {
@@ -45,7 +52,9 @@ describe("an Environment", function () {
 			});
 
 			it("undoes the set operation", function (done) {
-				expect(environment.get(context.name), "value").to.equal(context.originalValue);
+				expect(context.environment.get(context.name), "value")
+				.to.equal(context.originalValue);
+
 				done();
 			});
 		});
@@ -53,23 +62,20 @@ describe("an Environment", function () {
 
 	function describeSet (context) {
 		it("sets the value", function (done) {
-			expect(environment.get(context.name), "value").to.equal(context.value);
+			expect(context.environment.get(context.name), "value").to.equal(context.value);
 			done();
 		});
 
 		describeRestoreFunction(context);
 	}
 
-	before(function (done) {
-		environment = new Environment();
-		done();
-	});
-
 	describe("retrieving a variable that is not defined", function () {
 		var restore;
 		var result;
 
 		before(function (done) {
+			var environment = new Environment();
+
 			restore = set("FOO");
 			result  = environment.get("foo");
 			done();
@@ -91,6 +97,8 @@ describe("an Environment", function () {
 		var result;
 
 		before(function (done) {
+			var environment = new Environment();
+
 			restore = set("FOO", "bar");
 			result  = environment.get("foo");
 			done();
@@ -109,8 +117,9 @@ describe("an Environment", function () {
 
 	describe("setting a variable that is not defined", function () {
 		var context = {
-			name  : "foo",
-			value : "bar"
+			environment : new Environment(),
+			name        : "foo",
+			value       : "bar"
 		};
 
 		var restore;
@@ -118,8 +127,8 @@ describe("an Environment", function () {
 		before(function (done) {
 			restore = set("FOO");
 
-			context.originalValue = environment.get(context.name);
-			context.result        = environment.set(context.name, context.value);
+			context.originalValue = context.environment.get(context.name);
+			context.result        = context.environment.set(context.name, context.value);
 			done();
 		});
 
@@ -133,8 +142,9 @@ describe("an Environment", function () {
 
 	describe("setting a variable that is already defined", function () {
 		var context = {
-			name  : "foo",
-			value : "bar"
+			environment : new Environment(),
+			name        : "foo",
+			value       : "bar"
 		};
 
 		var restore;
@@ -142,8 +152,8 @@ describe("an Environment", function () {
 		before(function (done) {
 			restore = set("FOO", "bar");
 
-			context.originalValue = environment.get(context.name);
-			context.result        = environment.set(context.name, context.value);
+			context.originalValue = context.environment.get(context.name);
+			context.result        = context.environment.set(context.name, context.value);
 			done();
 		});
 
@@ -155,21 +165,70 @@ describe("an Environment", function () {
 		describeSet(context);
 	});
 
+	describe("deleting a variable that is not defined", function () {
+		var context = {
+			environment : new Environment(),
+			name        : "foo"
+		};
+
+		var restore;
+
+		before(function (done) {
+			restore = set("FOO");
+
+			context.originalValue = context.environment.get(context.name);
+			context.result        = context.environment.delete(context.name);
+			done();
+		});
+
+		after(function (done) {
+			restore();
+			done();
+		});
+
+		describeDelete(context);
+	});
+
+	describe("deleting a variable that is defined", function () {
+		var context = {
+			environment : new Environment(),
+			name        : "foo"
+		};
+
+		var restore;
+
+		before(function (done) {
+			restore = set("FOO", "foo");
+
+			context.originalValue = context.environment.get(context.name);
+			context.result        = context.environment.delete(context.name);
+			done();
+		});
+
+		after(function (done) {
+			restore();
+			done();
+		});
+
+		describeDelete(context);
+	});
+
 	describe("restoring all changes", function () {
-		var restore = [];
+		var environment = new Environment();
+		var restore     = [];
 
 		var bar;
 		var foo;
 
 		before(function (done) {
+			restore.push(set("BAR"));
+			restore.push(set("FOO", "foo"));
+
 			bar = environment.get("bar");
 			foo = environment.get("foo");
 
-			restore.push(set("BAR"));
-			restore.push(set("FOO"));
-
 			environment.set("bar", "bar");
-			environment.set("foo", "foo");
+			environment.delete("foo");
 			environment.restore();
 			done();
 		});
