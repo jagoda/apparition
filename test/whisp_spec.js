@@ -9,7 +9,7 @@ var it       = script.it;
 
 describe("the whisp library", function () {
 	it("exposes the environment helper", function (done) {
-		expect(whisp, "environment").to.have.property("Environment");
+		expect(whisp, "environment").to.have.property("Environment", require("../lib/Environment"));
 		done();
 	});
 });
