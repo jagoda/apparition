@@ -9,5 +9,5 @@ deploy:
     secure: Dk00dhFzd+Z5ucHv2E9bD//Lluj17CUcT6GymgUzSV9FeJA2kjqQ3MtUZLSFw31zmRSKEh8pzRNGXmWm4Pm84gIrUXLCDWS57vkM54MzRiP8vzjM1pnA2oQdTiZGk1q6aWZ4XlZP19j8MFOWt2eygeWERinqN+uYXYpHYbXZNQE=
   on:
     tags: true
-    repo: jagoda/whisp
+    repo: jagoda/apparition
     all_branches: true

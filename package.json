@@ -3,12 +3,12 @@
     "coverage": "gulp coverage",
     "test": "gulp"
   },
-  "name": "whisp",
+  "name": "apparition",
   "version": "0.1.0",
-  "description": "Enivorment variable helper utilities.",
+  "description": "A collection of test helpers.",
   "author": "Jeff Jagoda <jeffrey.jagoda@gmail.com>",
   "license": "MIT",
-  "main": "lib/whisp",
+  "main": "lib/apparition",
   "dependencies": {
     "lodash": "^2.4.1",
     "q": "^1.0.1"

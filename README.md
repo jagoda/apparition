@@ -1,7 +1,7 @@
-whisp
-=====
+apparition
+==========
 
-[![Build Status](https://travis-ci.org/jagoda/whisp.svg?branch=master)](https://travis-ci.org/jagoda/whisp)
+[![Build Status](https://travis-ci.org/jagoda/apparition.svg?branch=master)](https://travis-ci.org/jagoda/apparition)
 
 > Environment variable helper utilities.
 
