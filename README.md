@@ -3,7 +3,11 @@ apparition
 
 [![Build Status](https://travis-ci.org/jagoda/apparition.svg?branch=master)](https://travis-ci.org/jagoda/apparition)
 
-> Environment variable helper utilities.
+> A collection of test helpers.
+
+## Overview
+
+	npm install apparition
 
 ## Environment
 
@@ -15,7 +19,7 @@ All operations will normalize variable names to upper case. Every method other
 than `get()` and `restore()` returns a revert function that can be used to undo
 the operation.
 
-### enviroment.delete (name)
+### environment.delete (name)
 
 | parameter | description                        |
 |-----------|------------------------------------|
