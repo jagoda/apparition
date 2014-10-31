@@ -54,3 +54,21 @@ Reverts all changes to the environment since the last call to `restore()`.
 
 Sets the value of a specified environment variable. If the value is omitted,
 this is the same as calling `delete(name)`.
+
+
+## util
+The `util` helper module implements common patterns. It is used by other apparition modules,
+but can be used anywhere.
+
+### util.setValue (object, property, value)
+
+| parameter | description                        |
+|-----------|------------------------------------|
+| object    | the subject object                 |
+| property  | the property to set                |
+| value     | the value of the property to set   |
+
+**returns** an object that has a ```revert``` function
+
+Sets the value of an object property.
+
