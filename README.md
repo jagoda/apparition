@@ -11,11 +11,6 @@ apparition
 
 ## Properties
 
-```
-var subject = {};
-var properties = new Properties(subject);
-```
-
 The `Properties` helper provides a managed way to make changes to object's
 properties and then roll those changes back at a later point.
 
@@ -26,7 +21,7 @@ the operation.
 
 | parameter | description                                   |
 |-----------|-----------------------------------------------|
-| subject   | _optional_ the object managed by the helper   |
+| subject   | the object managed by the helper              |
 
 ### properties.deleteProperty (name)
 
@@ -62,7 +57,8 @@ Reverts all changes to the object since the last call to `restore()`.
 **returns** a revert function
 
 Sets the value of a specified property. If the value is omitted,
-this is the same as calling `delete(name)`.
+this is the same as calling `deleteProperty(name)`.
+
 
 ## Environment
 
