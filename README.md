@@ -9,7 +9,66 @@ apparition
 
 	npm install apparition
 
+## Properties
+
+```
+var subject = {};
+var properties = new Properties(subject);
+```
+
+The `Properties` helper provides a managed way to make changes to object's
+properties and then roll those changes back at a later point.
+
+Every method other than `get()` and `restore()` returns a revert function that can be used to undo
+the operation.
+
+### new Properties (subject)
+
+| parameter | description                                   |
+|-----------|-----------------------------------------------|
+| subject   | _optional_ the object managed by the helper   |
+
+### properties.deleteProperty (name)
+
+| parameter | description                        |
+|-----------|------------------------------------|
+| name      | the name of the property to delete |
+
+**returns** a revert function
+
+Unsets a specified object property.
+
+### properties.getProperty (name)
+
+| parameter | description                          |
+|-----------|--------------------------------------|
+| name      | the name of the property to retrieve |
+
+**returns** the value of the property or `undefined` if not set.
+
+Retrieves the current value of a specified property.
+
+### properties.restore ()
+
+Reverts all changes to the object since the last call to `restore()`.
+
+### properties.setProperty (name, [value])
+
+| parameter | description                        |
+|-----------|------------------------------------|
+| name      | the name of the property to update |
+| value     | _optional_ the value to set        |
+
+**returns** a revert function
+
+Sets the value of a specified property. If the value is omitted,
+this is the same as calling `delete(name)`.
+
 ## Environment
+
+```
+var environment = new Environment();
+```
 
 The `Environment` helper provides a managed way to make changes to the process
 environment and then roll those changes back at a later point. This is often
@@ -54,21 +113,3 @@ Reverts all changes to the environment since the last call to `restore()`.
 
 Sets the value of a specified environment variable. If the value is omitted,
 this is the same as calling `delete(name)`.
-
-
-## util
-The `util` helper module implements common patterns. It is used by other apparition modules,
-but can be used anywhere.
-
-### util.setValue (object, property, value)
-
-| parameter | description                        |
-|-----------|------------------------------------|
-| object    | the subject object                 |
-| property  | the property to set                |
-| value     | the value of the property to set   |
-
-**returns** an object that has a ```revert``` function
-
-Sets the value of an object property.
-

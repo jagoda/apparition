@@ -19,6 +19,7 @@
     "gulp-jshint": "^1.8.4",
     "gulp-lab": "^1.0.0",
     "jshint-stylish": "^0.4.0",
-    "lab": "^4.4.3"
+    "lab": "^4.4.3",
+    "sinon": "^1.11.1"
   }
 }
