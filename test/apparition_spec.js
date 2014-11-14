@@ -14,4 +14,11 @@ describe("the apparition library", function () {
 
 		done();
 	});
+
+	it("exposes the properties helper", function (done) {
+		expect(apparition, "properties")
+		.to.have.property("Properties", require("../lib/Properties"));
+
+		done();
+	});
 });

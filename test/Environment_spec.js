@@ -2,16 +2,12 @@
 var Environment = require("../lib/Environment");
 var Lab         = require("lab");
 var script      = exports.lab = Lab.script();
-var sinon       = require("sinon");
 
 var before   = script.before;
+var after    = script.after;
 var describe = script.describe;
 var expect   = Lab.expect;
 var it       = script.it;
-
-function normalizeName (name) {
-	return name.toUpperCase();
-}
 
 describe("an Environment", function () {
 	var environment;
@@ -22,53 +18,65 @@ describe("an Environment", function () {
 	});
 
 	describe("deleting a property", function () {
-		var deleteProperty;
-		var name = "test";
+		var name  = "test";
+		var value = "super-awesome-test-value";
 
 		before(function (done) {
-			deleteProperty = sinon.stub(environment, "deleteProperty");
+			process.env[name.toUpperCase()] = value;
 			environment.delete(name);
 			done();
 		});
 
+		after(function (done) {
+			environment.restore();
+			delete process.env[name.toUpperCase()];
+			done();
+		});
+
 		it("deletes the property", function (done) {
-			expect(deleteProperty.calledOnce, "not called").to.be.true;
-			expect(deleteProperty.calledWith(normalizeName(name)), "wrong args").to.be.true;
+			expect(process.env[name]).to.be.undefined;
 			done();
 		});
 	});
 
 	describe("setting a property", function () {
-		var setProperty;
-		var name = "test";
-		var value = "val";
+		var name  = "test";
+		var value = "super-awesome-test-value";
 
 		before(function (done) {
-			setProperty = sinon.stub(environment, "setProperty");
 			environment.set(name, value);
 			done();
 		});
 
-		it("sets the property", function (done) {
-			expect(setProperty.calledOnce, "not called").to.be.true;
-			expect(setProperty.calledWith(normalizeName(name), value), "wrong args").to.be.true;
+		after(function (done) {
+			environment.restore();
+			done();
+		});
+
+		it("deletes the property", function (done) {
+			expect(process.env[name.toUpperCase()]).to.equal(value);
 			done();
 		});
 	});
 
 	describe("getting a property", function () {
-		var getProperty;
-		var name = "test";
+		var name  = "test";
+		var value = "super-awesome-test-value";
 
 		before(function (done) {
-			getProperty = sinon.stub(environment, "getProperty");
+			process.env[name.toUpperCase()] = value;
 			environment.get(name);
 			done();
 		});
 
-		it("gets the property", function (done) {
-			expect(getProperty.calledOnce, "not called").to.be.true;
-			expect(getProperty.calledWith(normalizeName(name)), "wrong args").to.be.true;
+		after(function (done) {
+			delete process.env[name.toUpperCase()];
+			environment.restore();
+			done();
+		});
+
+		it("deletes the property", function (done) {
+			expect(process.env[name.toUpperCase()]).to.equal(value);
 			done();
 		});
 	});

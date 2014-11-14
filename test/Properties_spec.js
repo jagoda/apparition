@@ -10,15 +10,15 @@ var expect   = Lab.expect;
 var it       = script.it;
 
 describe("Properties", function () {
-	function describeDeleteProperty (context) {
+	function describeDelete (context) {
 		before(function (done) {
-			context.originalValue = context.properties.getProperty(context.name);
-			context.result        = context.properties.deleteProperty(context.name);
+			context.originalValue = context.properties.get(context.name);
+			context.result        = context.properties.delete(context.name);
 			done();
 		});
 
 		it("unsets the value", function (done) {
-			expect(context.properties.getProperty(context.name), "value").to.be.undefined;
+			expect(context.properties.get(context.name), "value").to.be.undefined;
 			done();
 		});
 
@@ -45,7 +45,7 @@ describe("Properties", function () {
 			});
 
 			it("undoes the set operation", function (done) {
-				expect(context.properties.getProperty(context.name), "value")
+				expect(context.properties.get(context.name), "value")
 				.to.equal(context.originalValue);
 
 				done();
@@ -53,15 +53,15 @@ describe("Properties", function () {
 		});
 	}
 
-	function describeSetProperty (context) {
+	function describeSet (context) {
 		before(function (done) {
-			context.originalValue = context.properties.getProperty(context.name);
-			context.result        = context.properties.setProperty(context.name, context.value);
+			context.originalValue = context.properties.get(context.name);
+			context.result        = context.properties.set(context.name, context.value);
 			done();
 		});
 
 		it("sets the value", function (done) {
-			expect(context.properties.getProperty(context.name), "value").to.equal(context.value);
+			expect(context.properties.get(context.name), "value").to.equal(context.value);
 			done();
 		});
 
@@ -74,7 +74,7 @@ describe("Properties", function () {
 		before(function (done) {
 			var properties = new Properties({});
 
-			result = properties.getProperty("foo");
+			result = properties.get("foo");
 			done();
 		});
 
@@ -92,7 +92,7 @@ describe("Properties", function () {
 				foo : "bar"
 			});
 
-			result  = properties.getProperty("foo");
+			result  = properties.get("foo");
 			done();
 		});
 
@@ -109,7 +109,7 @@ describe("Properties", function () {
 			value      : "bar"
 		};
 
-		describeSetProperty(context);
+		describeSet(context);
 	});
 
 	describe("setting a property that is already defined", function () {
@@ -121,7 +121,7 @@ describe("Properties", function () {
 			value      : "bar"
 		};
 
-		describeSetProperty(context);
+		describeSet(context);
 	});
 
 	describe("deleting a property that is not defined", function () {
@@ -130,7 +130,7 @@ describe("Properties", function () {
 			name       : "foo"
 		};
 
-		describeDeleteProperty(context);
+		describeDelete(context);
 	});
 
 	describe("deleting a property that is defined", function () {
@@ -141,7 +141,7 @@ describe("Properties", function () {
 			name       : "foo"
 		};
 
-		describeDeleteProperty(context);
+		describeDelete(context);
 	});
 
 	describe("restoring all changes", function () {
@@ -151,18 +151,18 @@ describe("Properties", function () {
 		var foo;
 
 		before(function (done) {
-			bar = properties.getProperty("bar");
-			foo = properties.getProperty("foo");
+			bar = properties.get("bar");
+			foo = properties.get("foo");
 
-			properties.setProperty("bar", "bar");
-			properties.deleteProperty("foo");
+			properties.set("bar", "bar");
+			properties.delete("foo");
 			properties.restore();
 			done();
 		});
 
 		it("reverts all changes to the properties", function (done) {
-			expect(properties.getProperty("bar"), "bar").to.equal(bar);
-			expect(properties.getProperty("foo"), "foo").to.equal(foo);
+			expect(properties.get("bar"), "bar").to.equal(bar);
+			expect(properties.get("foo"), "foo").to.equal(foo);
 			done();
 		});
 	});
