@@ -1,5 +1,6 @@
 "use strict";
 var Environment = require("../lib/Environment");
+var Properties  = require("../lib/Properties");
 var Lab         = require("lab");
 var script      = exports.lab = Lab.script();
 
@@ -11,9 +12,22 @@ var it       = script.it;
 
 describe("an Environment", function () {
 	var environment;
+	var env;
 
 	before(function (done) {
+		env = process.env;
+		process.env = {};
 		environment = new Environment();
+		done();
+	});
+
+	after(function (done) {
+		process.env = env;
+		done();
+	});
+
+	it("is a Properties", function (done) {
+		expect(environment, "not a Properties").to.be.an.instanceof(Properties);
 		done();
 	});
 

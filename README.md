@@ -23,7 +23,7 @@ the operation.
 |-----------|-----------------------------------------------|
 | subject   | the object managed by the helper              |
 
-### properties.deleteProperty (name)
+### properties.delete (name)
 
 | parameter | description                        |
 |-----------|------------------------------------|
@@ -33,7 +33,7 @@ the operation.
 
 Unsets a specified object property.
 
-### properties.getProperty (name)
+### properties.get (name)
 
 | parameter | description                          |
 |-----------|--------------------------------------|
@@ -47,7 +47,7 @@ Retrieves the current value of a specified property.
 
 Reverts all changes to the object since the last call to `restore()`.
 
-### properties.setProperty (name, [value])
+### properties.set (name, [value])
 
 | parameter | description                        |
 |-----------|------------------------------------|
@@ -57,7 +57,7 @@ Reverts all changes to the object since the last call to `restore()`.
 **returns** a revert function
 
 Sets the value of a specified property. If the value is omitted,
-this is the same as calling `deleteProperty(name)`.
+this is the same as calling `delete(name)`.
 
 
 ## Environment
