@@ -9,7 +9,62 @@ apparition
 
 	npm install apparition
 
+## Properties
+
+The `Properties` helper provides a managed way to make changes to object's
+properties and then roll those changes back at a later point.
+
+Every method other than `get()` and `restore()` returns a revert function that can be used to undo
+the operation.
+
+### new Properties (subject)
+
+| parameter | description                                   |
+|-----------|-----------------------------------------------|
+| subject   | the object managed by the helper              |
+
+### properties.delete (name)
+
+| parameter | description                        |
+|-----------|------------------------------------|
+| name      | the name of the property to delete |
+
+**returns** a revert function
+
+Unsets a specified object property.
+
+### properties.get (name)
+
+| parameter | description                          |
+|-----------|--------------------------------------|
+| name      | the name of the property to retrieve |
+
+**returns** the value of the property or `undefined` if not set.
+
+Retrieves the current value of a specified property.
+
+### properties.restore ()
+
+Reverts all changes to the object since the last call to `restore()`.
+
+### properties.set (name, [value])
+
+| parameter | description                        |
+|-----------|------------------------------------|
+| name      | the name of the property to update |
+| value     | _optional_ the value to set        |
+
+**returns** a revert function
+
+Sets the value of a specified property. If the value is omitted,
+this is the same as calling `delete(name)`.
+
+
 ## Environment
+
+```
+var environment = new Environment();
+```
 
 The `Environment` helper provides a managed way to make changes to the process
 environment and then roll those changes back at a later point. This is often
