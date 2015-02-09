@@ -1,4 +1,5 @@
 "use strict";
+var Code        = require("code");
 var Environment = require("../lib/Environment");
 var Properties  = require("../lib/Properties");
 var Lab         = require("lab");
@@ -7,7 +8,7 @@ var script      = exports.lab = Lab.script();
 var before   = script.before;
 var after    = script.after;
 var describe = script.describe;
-var expect   = Lab.expect;
+var expect   = Code.expect;
 var it       = script.it;
 
 describe("an Environment", function () {

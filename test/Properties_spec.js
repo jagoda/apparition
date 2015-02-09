@@ -1,4 +1,5 @@
 "use strict";
+var Code       = require("code");
 var Properties = require("../lib/Properties");
 var Lab         = require("lab");
 var script      = exports.lab = Lab.script();
@@ -6,7 +7,7 @@ var script      = exports.lab = Lab.script();
 var after    = script.after;
 var before   = script.before;
 var describe = script.describe;
-var expect   = Lab.expect;
+var expect   = Code.expect;
 var it       = script.it;
 
 describe("Properties", function () {
@@ -18,7 +19,7 @@ describe("Properties", function () {
 		});
 
 		it("unsets the value", function (done) {
-			expect(context.properties.get(context.name), "value").to.be.undefined;
+			expect(context.properties.get(context.name), "value").to.be.undefined();
 			done();
 		});
 
@@ -27,7 +28,7 @@ describe("Properties", function () {
 
 	function describeRestoreFunction (context) {
 		it("returns a 'restore' function", function (done) {
-			expect(context.result, "type").to.be.a("function");
+			expect(context.result, "type").to.be.a.function();
 			done();
 		});
 
@@ -79,7 +80,7 @@ describe("Properties", function () {
 		});
 
 		it("returns 'undefined'", function (done) {
-			expect(result, "result").to.be.undefined;
+			expect(result, "result").to.be.undefined();
 			done();
 		});
 	});
