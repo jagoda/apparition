@@ -385,4 +385,61 @@ describe("Properties", function () {
 			done();
 		});
 	});
+
+	describe("restoring all changes after calling an individual restore function", function () {
+		var bar = "bar";
+		var properties = new Properties({});
+
+		before(function (done) {
+			var individualRestore = properties.set("bar", bar);
+			individualRestore();
+			properties.restore();
+			done();
+		});
+
+		it("reverts all changes to the properties", function (done) {
+			expect(properties.get("bar"), "bar").to.be.undefined;
+			done();
+		});
+	});
+
+	describe("restoring all changes after calling a batch set restore function", function () {
+		var multiA = "a";
+		var multiB = "b";
+
+		var properties = new Properties({});
+
+		before(function (done) {
+			var batchRestore = properties.setAll({ multiA : multiA, multiB : multiB });
+			batchRestore();
+			properties.restore();
+			done();
+		});
+
+		it("reverts all changes to the properties", function (done) {
+			expect(properties.get("multiA"), "multiA").to.be.undefined;
+			expect(properties.get("multiB"), "multiB").to.be.undefined;
+			done();
+		});
+	});
+
+	describe("restoring all changes after calling a batch delete function", function () {
+		var multiA = "a";
+		var multiB = "b";
+
+		var properties = new Properties({ multiA : "a", multiB : "b" });
+
+		before(function (done) {
+			var batchRestore = properties.deleteAll([ "multiA", "multiB" ]);
+			batchRestore();
+			properties.restore();
+			done();
+		});
+
+		it("reverts all changes to the properties", function (done) {
+			expect(properties.get("multiA"), "multiA").to.equal(multiA);
+			expect(properties.get("multiB"), "multiB").to.equal(multiB);
+			done();
+		});
+	});
 });
