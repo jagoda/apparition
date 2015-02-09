@@ -34,12 +34,12 @@ describe("an Environment", function () {
 	});
 
 	it("has a static create function", function (done) {
-		expect(Environment.create, "no create function").to.be.a("function");
+		expect(Environment.create, "no create function").to.be.a.function();
 		done();
 	});
 
 	it("has constant static properties", function (done) {
-		expect(Object.isFrozen(Environment), "frozen").to.be.true;
+		expect(Object.isFrozen(Environment), "frozen").to.be.true();
 		done();
 	});
 
@@ -60,7 +60,7 @@ describe("an Environment", function () {
 		});
 
 		it("deletes the property", function (done) {
-			expect(process.env[name]).to.be.undefined;
+			expect(process.env[name]).to.be.undefined();
 			done();
 		});
 	});
@@ -88,7 +88,7 @@ describe("an Environment", function () {
 
 		it("deletes the properties", function (done) {
 			names.forEach(function (name) {
-				expect(process.env[name.toUpperCase()]).to.be.undefined;
+				expect(process.env[name.toUpperCase()]).to.be.undefined();
 			});
 			done();
 		});
@@ -189,7 +189,7 @@ describe("an Environment", function () {
 		});
 
 		it("unsets extra properties", function (done) {
-			expect(process.env.BAZ, "extra value").to.be.undefined;
+			expect(process.env.BAZ, "extra value").to.be.undefined();
 			done();
 		});
 	});

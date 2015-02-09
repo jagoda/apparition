@@ -36,7 +36,7 @@ describe("Properties", function () {
 
 		it("sets the values", function (done) {
 			_.forEach(context.names, function (key) {
-				expect(context.properties.get(key), "value of " + key).to.be.undefined;
+				expect(context.properties.get(key), "value of " + key).to.be.undefined();
 			});
 			done();
 		});
@@ -74,7 +74,7 @@ describe("Properties", function () {
 
 	function describeRestoreAllFunction (context, isDeleteOperation) {
 		it("returns a 'restoreAll' function", function (done) {
-			expect(context.result, "type").to.be.a("function");
+			expect(context.result, "type").to.be.a.function();
 			done();
 		});
 
@@ -99,7 +99,7 @@ describe("Properties", function () {
 
 	function describeRestoreAllRevertFunction (context, isDeleteOperation) {
 		it("returns a revert function after restoring", function (done) {
-			expect(context.revert, "type").to.be.a("function");
+			expect(context.revert, "type").to.be.a.function();
 			done();
 		});
 
@@ -112,7 +112,7 @@ describe("Properties", function () {
 			if (isDeleteOperation) {
 				it("redoes multiple delete operations", function (done) {
 					_.forEach(context.names, function (name) {
-						expect(context.properties.get(name), "value of " + name).to.be.undefined;
+						expect(context.properties.get(name), "value of " + name).to.be.undefined();
 					});
 
 					done();
@@ -398,7 +398,7 @@ describe("Properties", function () {
 		});
 
 		it("reverts all changes to the properties", function (done) {
-			expect(properties.get("bar"), "bar").to.be.undefined;
+			expect(properties.get("bar"), "bar").to.be.undefined();
 			done();
 		});
 	});
@@ -417,8 +417,8 @@ describe("Properties", function () {
 		});
 
 		it("reverts all changes to the properties", function (done) {
-			expect(properties.get("multiA"), "multiA").to.be.undefined;
-			expect(properties.get("multiB"), "multiB").to.be.undefined;
+			expect(properties.get("multiA"), "multiA").to.be.undefined();
+			expect(properties.get("multiB"), "multiB").to.be.undefined();
 			done();
 		});
 	});
