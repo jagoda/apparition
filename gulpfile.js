@@ -1,10 +1,12 @@
 "use strict";
 var Bluebird = require("bluebird");
+var Enforcer = require("gulp-istanbul-enforcer");
 var Fs       = require("fs");
 var Gulp     = require("gulp");
+var Istanbul = require("gulp-istanbul");
 var Jscs     = require("gulp-jscs");
 var JsHint   = require("gulp-jshint");
-var Lab      = require("gulp-lab");
+var Mocha    = require("gulp-mocha");
 var Path     = require("path");
 var Stylish  = require("jshint-stylish");
 
@@ -57,15 +59,6 @@ function style (options, files) {
 	return Gulp.src(files).pipe(new Jscs(options));
 }
 
-Gulp.task("coverage", function () {
-	var options = {
-		args : "-p -r html -o" + Path.join(__dirname, "coverage.html"),
-		opts : { emitLabError : false }
-	};
-
-	return Gulp.src(paths.test).pipe(new Lab(options));
-});
-
 Gulp.task("default", [ "test" ]);
 
 Gulp.task("lint", [ "lint-source", "lint-test" ]);
@@ -95,11 +88,32 @@ Gulp.task("style", function () {
 	});
 });
 
-Gulp.task("test", [ "lint", "style" ], function () {
+Gulp.task("test", [ "testcases" ], function () {
 	var options = {
-		args : "-p -t 100",
-		opts : { emitLabError : true }
+		coverageDirectory : "coverage",
+		rootDirectory     : __dirname,
+
+		thresholds : {
+			branches   : 100,
+			functions  : 100,
+			lines      : 100,
+			statements : 100
+		}
 	};
 
-	return Gulp.src(paths.test).pipe(new Lab(options));
+	return Gulp.src(".").pipe(new Enforcer(options));
+});
+
+Gulp.task("testcases", [ "lint", "style" ], function (done) {
+	var stream = Gulp.src(paths.source)
+	.pipe(new Istanbul())
+	.pipe(Istanbul.hookRequire())
+	.on("finish", function () {
+		var stream = Gulp.src(paths.test)
+		.pipe(new Mocha())
+		.pipe(Istanbul.writeReports())
+		.on("end", done);
+		consume(stream);
+	});
+	consume(stream);
 });

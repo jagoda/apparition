@@ -1,67 +1,44 @@
 "use strict";
-var Code        = require("code");
 var Environment = require("../lib/Environment");
 var Properties  = require("../lib/Properties");
-var Lab         = require("lab");
-var script      = exports.lab = Lab.script();
-var _           = require("lodash");
 
-var before   = script.before;
-var after    = script.after;
-var describe = script.describe;
-var expect   = Code.expect;
-var it       = script.it;
+var expect = require("chai").expect;
+var _      = require("lodash");
 
-describe("an Environment", function () {
+describe("An Environment", function () {
 	var environment;
 	var env;
 
-	before(function (done) {
+	before(function () {
 		env = process.env;
 		process.env = {};
 		environment = new Environment();
-		done();
 	});
 
-	after(function (done) {
+	after(function () {
 		process.env = env;
-		done();
 	});
 
-	it("is a Properties", function (done) {
-		expect(environment, "not a Properties").to.be.an.instanceof(Properties);
-		done();
-	});
-
-	it("has a static create function", function (done) {
-		expect(Environment.create, "no create function").to.be.a.function();
-		done();
-	});
-
-	it("has constant static properties", function (done) {
-		expect(Object.isFrozen(Environment), "frozen").to.be.true();
-		done();
+	it("is a Properties instance", function () {
+		expect(environment, "type").to.be.an.instanceof(Properties);
 	});
 
 	describe("deleting a property", function () {
 		var name  = "test";
 		var value = "super-awesome-test-value";
 
-		before(function (done) {
+		before(function () {
 			process.env[name.toUpperCase()] = value;
 			environment.delete(name);
-			done();
 		});
 
-		after(function (done) {
+		after(function () {
 			environment.restore();
 			delete process.env[name.toUpperCase()];
-			done();
 		});
 
-		it("deletes the property", function (done) {
-			expect(process.env[name]).to.be.undefined();
-			done();
+		it("deletes the property", function () {
+			expect(process.env[name]).to.be.undefined;
 		});
 	});
 
@@ -69,28 +46,25 @@ describe("an Environment", function () {
 		var names = [ "foo", "bar" ];
 		var value = "super-awesome-test-value";
 
-		before(function (done) {
+		before(function () {
 			names.forEach(function (name) {
 				process.env[name.toUpperCase()] = value;
 			});
 
 			environment.deleteAll(names);
-			done();
 		});
 
-		after(function (done) {
+		after(function () {
 			environment.restore();
 			names.forEach(function (name) {
 				delete process.env[name.toUpperCase()];
 			});
-			done();
 		});
 
-		it("deletes the properties", function (done) {
+		it("deletes the properties", function () {
 			names.forEach(function (name) {
-				expect(process.env[name.toUpperCase()]).to.be.undefined();
+				expect(process.env[name.toUpperCase()]).to.be.undefined;
 			});
-			done();
 		});
 	});
 
@@ -98,19 +72,16 @@ describe("an Environment", function () {
 		var name  = "test";
 		var value = "super-awesome-test-value";
 
-		before(function (done) {
+		before(function () {
 			environment.set(name, value);
-			done();
 		});
 
-		after(function (done) {
+		after(function () {
 			environment.restore();
-			done();
 		});
 
-		it("sets the property", function (done) {
+		it("sets the property", function () {
 			expect(process.env[name.toUpperCase()]).to.equal(value);
-			done();
 		});
 	});
 
@@ -120,21 +91,18 @@ describe("an Environment", function () {
 			bar : "bar"
 		};
 
-		before(function (done) {
+		before(function () {
 			environment.setAll(values);
-			done();
 		});
 
-		after(function (done) {
+		after(function () {
 			environment.restore();
-			done();
 		});
 
-		it("sets the properties", function (done) {
+		it("sets the properties", function () {
 			_.forEach(values, function (value, key) {
 				expect(process.env[key.toUpperCase()]).to.equal(value);
 			});
-			done();
 		});
 	});
 
@@ -142,21 +110,18 @@ describe("an Environment", function () {
 		var name  = "test";
 		var value = "super-awesome-test-value";
 
-		before(function (done) {
+		before(function () {
 			process.env[name.toUpperCase()] = value;
 			environment.get(name);
-			done();
 		});
 
-		after(function (done) {
+		after(function () {
 			delete process.env[name.toUpperCase()];
 			environment.restore();
-			done();
 		});
 
-		it("deletes the property", function (done) {
+		it("deletes the property", function () {
 			expect(process.env[name.toUpperCase()]).to.equal(value);
-			done();
 		});
 	});
 
@@ -168,29 +133,25 @@ describe("an Environment", function () {
 
 		var environment;
 
-		before(function (done) {
+		before(function () {
 			process.env.BAZ = "unwanted value";
 			process.env.FOO = "overwritten value";
 
 			environment = Environment.create(values);
-			done();
 		});
 
-		after(function (done) {
+		after(function () {
 			environment.restore();
-			done();
 		});
 
-		it("sets the provided properties", function (done) {
+		it("sets the provided properties", function () {
 			_.forEach(values, function (value, key) {
 				expect(process.env[key.toUpperCase()]).to.equal(value);
 			});
-			done();
 		});
 
-		it("unsets extra properties", function (done) {
-			expect(process.env.BAZ, "extra value").to.be.undefined();
-			done();
+		it("unsets extra properties", function () {
+			expect(process.env.BAZ, "extra value").to.be.undefined;
 		});
 	});
 });
