@@ -2,142 +2,14 @@
 var Properties = require("../lib/Properties");
 
 var expect = require("chai").expect;
-var _      = require("lodash");
 
-describe("Properties", function () {
-	function describeDelete (context) {
-		before(function () {
-			context.originalValue = context.properties.get(context.name);
-			context.result        = context.properties.delete(context.name);
-		});
-
-		it("unsets the value", function () {
-			expect(context.properties.get(context.name), "value").to.be.undefined;
-		});
-
-		describeRestoreFunction(context);
-	}
-
-	function describeDeleteAll (context) {
-		before(function () {
-			context.originalValues = _.pick(context.properties, context.names);
-			context.result         = context.properties.deleteAll(context.names);
-		});
-
-		it("sets the values", function () {
-			_.forEach(context.names, function (key) {
-				expect(context.properties.get(key), "value of " + key).to.be.undefined;
-			});
-		});
-
-		describeRestoreAllFunction(context, true);
-	}
-
-	function describeRestoreFunction (context) {
-		it("returns a 'restore' function", function () {
-			expect(context.result, "type").to.be.a("function");
-		});
-
-		describe("and invoking the restore function", function () {
-			var restore;
-
-			before(function () {
-				restore = context.result();
-			});
-
-			after(function () {
-				restore();
-			});
-
-			it("undoes the set operation", function () {
-				expect(context.properties.get(context.name), "value")
-				.to.equal(context.originalValue);
-			});
-		});
-	}
-
-	function describeRestoreAllFunction (context, isDeleteOperation) {
-		it("returns a 'restoreAll' function", function () {
-			expect(context.result, "type").to.be.a("function");
-		});
-
-		describe("and invoking the restore function", function () {
-			before(function () {
-				context.revert = context.result();
-			});
-
-			it("undoes multiple set operations", function () {
-				_.forEach(context.originalValues, function (value, key) {
-					expect(context.properties.get(key), "value of " + key).to.equal(value);
-				});
-			});
-
-			// batch operations' reversion function is more complicated, so test it too
-			describeRestoreAllRevertFunction(context, isDeleteOperation);
-		});
-	}
-
-	function describeRestoreAllRevertFunction (context, isDeleteOperation) {
-		it("returns a revert function after restoring", function () {
-			expect(context.revert, "type").to.be.a("function");
-		});
-
-		describe("and invoking the revert function", function () {
-			before(function () {
-				context.revert();
-			});
-
-			if (isDeleteOperation) {
-				it("redoes multiple delete operations", function () {
-					_.forEach(context.names, function (name) {
-						expect(context.properties.get(name), "value of " + name).to.be.undefined;
-					});
-				});
-			}
-			else {
-				it("redoes multiple set operations", function () {
-					_.forEach(context.values, function (value, key) {
-						expect(context.properties.get(key), "value of " + key).to.equal(value);
-					});
-				});
-			}
-		});
-	}
-
-	function describeSet (context) {
-		before(function () {
-			context.originalValue = context.properties.get(context.name);
-			context.result        = context.properties.set(context.name, context.value);
-		});
-
-		it("sets the value", function () {
-			expect(context.properties.get(context.name), "value").to.equal(context.value);
-		});
-
-		describeRestoreFunction(context);
-	}
-
-	function describeSetAll (context) {
-		before(function () {
-			context.originalValues = _.pick(context.properties, _.keys(context.values));
-			context.result         = context.properties.setAll(context.values);
-		});
-
-		it("sets the values", function () {
-			_.forEach(context.values, function (value, key) {
-				expect(context.properties.get(key), "value of " + key).to.equal(value);
-			});
-		});
-
-		describeRestoreAllFunction(context);
-	}
-
+describe("A Properties helper", function () {
 	describe("retrieving a property that is not defined", function () {
+		var properties = new Properties({});
+
 		var result;
 
 		before(function () {
-			var properties = new Properties({});
-
 			result = properties.get("foo");
 		});
 
@@ -147,14 +19,14 @@ describe("Properties", function () {
 	});
 
 	describe("retrieving a property that is defined", function () {
+		var properties = new Properties({
+			foo : "bar"
+		});
+
 		var result;
 
 		before(function () {
-			var properties = new Properties({
-				foo : "bar"
-			});
-
-			result  = properties.get("foo");
+			result = properties.get("foo");
 		});
 
 		it("returns the value", function () {
@@ -163,237 +35,128 @@ describe("Properties", function () {
 	});
 
 	describe("setting a property that is not defined", function () {
-		var context = {
-			properties : new Properties({}),
-			name       : "foo",
-			value      : "bar"
-		};
+		var object     = {};
+		var properties = new Properties(object);
 
-		describeSet(context);
+		before(function () {
+			properties.set("foo", "bar");
+		});
+
+		it("updates the value", function () {
+			expect(object, "value").to.have.property("foo", "bar");
+		});
+
+		describe("then reverting the changes", function () {
+			before(function () {
+				properties.restore();
+			});
+
+			it("restores the previous value", function () {
+				expect(object, "value").not.to.have.property("foo");
+			});
+		});
 	});
 
 	describe("setting a property that is already defined", function () {
-		var context = {
-			properties : new Properties({
-				foo : "bar"
-			}),
-			name       : "foo",
-			value      : "bar"
-		};
+		var object     = { foo : "bar" };
+		var properties = new Properties(object);
 
-		describeSet(context);
-	});
+		before(function () {
+			properties.set("foo", "foo");
+		});
 
-	describe("setting multiple properties that are not defined", function () {
-		var context = {
-			properties : new Properties({}),
-			values     : { foo : "foo", bar : "bar" }
-		};
+		it("updates the value", function () {
+			expect(object, "value").to.have.property("foo", "foo");
+		});
 
-		describeSetAll(context);
-	});
+		describe("then reverting the changes", function () {
+			before(function () {
+				properties.restore();
+			});
 
-	describe("setting multiple properties that are defined and not defined", function () {
-		var context = {
-			properties : new Properties({
-				foo : "foo"
-			}),
-
-			values : { foo : "foo2", bar : "bar" }
-		};
-
-		describeSetAll(context);
-	});
-
-	describe("setting multiple properties that are all defined", function () {
-		var context = {
-			properties : new Properties({
-				foo : "foo",
-				bar : "bar"
-			}),
-
-			values : { foo : "foo2", bar : "bar2" }
-		};
-
-		describeSetAll(context);
+			it("restores the previous value", function () {
+				expect(object, "value").to.have.property("foo", "bar");
+			});
+		});
 	});
 
 	describe("deleting a property that is not defined", function () {
-		var context = {
-			properties : new Properties({}),
-			name       : "foo"
-		};
+		var object     = {};
+		var properties = new Properties(object);
 
-		describeDelete(context);
+		before(function () {
+			properties.delete("foo");
+		});
+
+		it("does nothing", function () {
+			expect(object, "keys").to.be.empty;
+		});
+
+		describe("then reverting the changes", function () {
+			before(function () {
+				properties.restore();
+			});
+
+			it("does nothing", function () {
+				expect(object, "keys").to.be.empty;
+			});
+		});
 	});
 
 	describe("deleting a property that is defined", function () {
-		var context = {
-			properties : new Properties({
-				foo : "foo"
-			}),
-			name       : "foo"
-		};
-
-		describeDelete(context);
-	});
-
-	describe("deleting multiple properties that are not defined", function () {
-		var context = {
-			properties : new Properties({}),
-			names      : [ "foo", "bar" ]
-		};
-
-		describeDeleteAll(context);
-	});
-
-	describe("deleting multiple properties that are defined and not defined", function () {
-		var context = {
-			properties : new Properties({
-				foo : "foo"
-			}),
-
-			names : [ "foo", "bar" ]
-		};
-
-		describeDeleteAll(context);
-	});
-
-	describe("deleting multiple properties that are all defined", function () {
-		var context = {
-			properties : new Properties({
-				foo : "foo",
-				bar : "bar"
-			}),
-
-			names : [ "foo", "bar" ]
-		};
-
-		describeDeleteAll(context);
-	});
-
-	describe("restoring multiple single-value changes", function () {
-		var properties = new Properties({});
-
-		var bar;
-		var foo;
+		var object     = { foo : "bar" };
+		var properties = new Properties(object);
 
 		before(function () {
-			bar = properties.get("bar");
-			foo = properties.get("foo");
-
-			properties.set("bar", "bar");
 			properties.delete("foo");
-			properties.restore();
 		});
 
-		it("reverts all changes to the properties", function () {
-			expect(properties.get("bar"), "bar").to.equal(bar);
-			expect(properties.get("foo"), "foo").to.equal(foo);
-		});
-	});
-
-	describe("restoring single- and multi-value changes", function () {
-		var single = "single value";
-		var multiA = "a";
-		var multiB = "b";
-
-		var properties = new Properties({
-			single : single,
-			multiA : multiA,
-			multiB : multiB
+		it("removes the value", function () {
+			expect(object, "value").not.to.have.property("foo");
 		});
 
-		before(function () {
-			properties.set("single", "new value");
-			properties.setAll({ multiA : "a2", multiB : "b2" });
-			properties.delete("multiA");
-			properties.restore();
-		});
+		describe("then reverting the changes", function () {
+			before(function () {
+				properties.restore();
+			});
 
-		it("reverts all changes to the properties", function () {
-			expect(properties.get("single"), "single value").to.equal(single);
-			expect(properties.get("multiA"), "multiple value A").to.equal(multiA);
-			expect(properties.get("multiB"), "multiple value B").to.equal(multiB);
+			it("restores the previous value", function () {
+				expect(object, "value").to.have.property("foo", "bar");
+			});
 		});
 	});
 
-	describe("restoring multi-value changes", function () {
-		var multiA1 = "a1";
-		var multiA2 = "a2";
-		var multiB1 = "b1";
-		var multiB2 = "b2";
-
-		var properties = new Properties({
-			multiA1 : multiA1,
-			multiA2 : multiA2,
-			multiB1 : multiB1,
-			multiB2 : multiB2
-		});
+	describe("chaining multiple operations", function () {
+		var object     = { testy : "tester" };
+		var properties = new Properties(object);
 
 		before(function () {
-			properties.setAll({ multiA1 : "x", multiA2 : "x" });
-			properties.deleteAll([ "multiB1", "multiB2" ]);
-			properties.setAll({ multiB1 : "x", multiB2 : "x" });
-			properties.restore();
+			properties
+			.set("foo", "foo")
+			.set("bar", "bar")
+			.set("baz", "baz")
+			.delete("foo")
+			.delete("baz")
+			.set("bar", "foo")
+			.set("baz", "bar");
 		});
 
-		it("reverts all changes to the properties", function () {
-			expect(properties.get("multiA1"), "multiple value A 1").to.equal(multiA1);
-			expect(properties.get("multiA2"), "multiple value A 1").to.equal(multiA2);
-			expect(properties.get("multiB1"), "multiple value A 1").to.equal(multiB1);
-			expect(properties.get("multiB2"), "multiple value A 1").to.equal(multiB2);
-		});
-	});
-
-	describe("restoring all changes after calling an individual restore function", function () {
-		var bar = "bar";
-		var properties = new Properties({});
-
-		before(function () {
-			var individualRestore = properties.set("bar", bar);
-			individualRestore();
-			properties.restore();
+		it("applies all operations sequentially", function () {
+			expect(object, "properties").to.deep.equal({
+				bar   : "foo",
+				baz   : "bar",
+				testy : "tester"
+			});
 		});
 
-		it("reverts all changes to the properties", function () {
-			expect(properties.get("bar"), "bar").to.be.undefined;
-		});
-	});
+		describe("then reverting the changes", function () {
+			before(function () {
+				properties.restore();
+			});
 
-	describe("restoring all changes after calling a batch set restore function", function () {
-		var multiA = "a";
-		var multiB = "b";
-
-		var properties = new Properties({});
-
-		before(function () {
-			var batchRestore = properties.setAll({ multiA : multiA, multiB : multiB });
-			batchRestore();
-			properties.restore();
-		});
-
-		it("reverts all changes to the properties", function () {
-			expect(properties.get("multiA"), "multiA").to.be.undefined;
-			expect(properties.get("multiB"), "multiB").to.be.undefined;
-		});
-	});
-
-	describe("restoring all changes after calling a batch delete function", function () {
-		var multiA = "a";
-		var multiB = "b";
-
-		var properties = new Properties({ multiA : "a", multiB : "b" });
-
-		before(function () {
-			var batchRestore = properties.deleteAll([ "multiA", "multiB" ]);
-			batchRestore();
-			properties.restore();
-		});
-
-		it("reverts all changes to the properties", function () {
-			expect(properties.get("multiA"), "multiA").to.equal(multiA);
-			expect(properties.get("multiB"), "multiB").to.equal(multiB);
+			it("restores the previous values", function () {
+				expect(object, "properties").to.deep.equal({ testy : "tester" });
+			});
 		});
 	});
 });
