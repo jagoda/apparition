@@ -1,15 +1,17 @@
 "use strict";
-var Fs      = require("fs");
-var Gulp    = require("gulp");
-var Jscs    = require("gulp-jscs");
-var JsHint  = require("gulp-jshint");
-var Lab     = require("gulp-lab");
-var Path    = require("path");
-var Q       = require("q");
-var Stylish = require("jshint-stylish");
+var Bluebird = require("bluebird");
+var Fs       = require("fs");
+var Gulp     = require("gulp");
+var Jscs     = require("gulp-jscs");
+var JsHint   = require("gulp-jshint");
+var Lab      = require("gulp-lab");
+var Path     = require("path");
+var Stylish  = require("jshint-stylish");
 
 var consume = require("stream-consume");
 var _       = require("lodash");
+
+Bluebird.promisifyAll(Fs);
 
 var paths = {
 	jscs : Path.join(__dirname, ".jscsrc"),
@@ -37,20 +39,18 @@ function lint (options, files) {
 }
 
 function loadOptions (path) {
-	return Q.ninvoke(Fs, "readFile", path, { encoding : "utf8" })
+	return Fs.readFileAsync(path, { encoding : "utf-8" })
 	.then(function (contents) {
 		return JSON.parse(contents);
 	});
 }
 
 function promisefy (stream) {
-	var deferred = Q.defer();
-
-	stream.once("finish", deferred.resolve.bind(deferred));
-	stream.once("error", deferred.reject.bind(deferred));
-	consume(stream);
-
-	return deferred.promise;
+	return new Bluebird(function (resolve, reject) {
+		stream.once("finish", resolve);
+		stream.once("error", reject);
+		consume(stream);
+	});
 }
 
 function style (options, files) {
@@ -78,14 +78,14 @@ Gulp.task("lint-source", function () {
 });
 
 Gulp.task("lint-test", function () {
-	return Q.all([
+	return Bluebird.join(
 		loadOptions(paths.jshint.source),
-		loadOptions(paths.jshint.test)
-	])
-	.spread(function (source, test) {
-		var options = _.merge(source, test);
-		return promisefy(lint(options, paths.test));
-	});
+		loadOptions(paths.jshint.test),
+		function (source, test) {
+			var options = _.merge(source, test);
+			return promisefy(lint(options, paths.test));
+		}
+	);
 });
 
 Gulp.task("style", function () {

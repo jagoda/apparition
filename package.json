@@ -10,8 +10,8 @@
   "license": "MIT",
   "main": "lib/apparition",
   "dependencies": {
+    "bluebird": "^2.9.14",
     "lodash": "^2.4.1",
-    "q": "^1.0.1",
     "stream-consume": "^0.1.0"
   },
   "devDependencies": {
