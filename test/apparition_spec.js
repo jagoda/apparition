@@ -13,4 +13,9 @@ describe("The Apparition library", function () {
 		expect(Apparition, "properties")
 		.to.have.property("Properties", require("../lib/Properties"));
 	});
+
+	it("exposes the request helper", function () {
+		expect(Apparition, "request")
+		.to.have.property("Request", require("../lib/Request"));
+	});
 });
