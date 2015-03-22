@@ -19,6 +19,19 @@ describe("A Request helper", function () {
 		}
 	});
 
+	server.route({
+		method  : "post",
+		path    : "/generic",
+
+		config : {
+			payload : { parse : false }
+		},
+
+		handler : function (request, reply) {
+			reply(_.pick(request, "headers", "payload"));
+		}
+	});
+
 	describe("injecting a request into a server instance", function () {
 		var response;
 
@@ -77,7 +90,7 @@ describe("A Request helper", function () {
 			var response;
 
 			before(function () {
-				var request = new Request("post", "/").payload(payload);
+				var request = new Request("post", "/generic").payload(payload);
 
 				return request.inject(server)
 				.then(function (data) {
@@ -87,7 +100,8 @@ describe("A Request helper", function () {
 
 			it("sends a generic request payload", function () {
 				expect(response.result.headers["content-type"], "headers").not.to.exist;
-				expect(response.result.payload, "payload").to.deep.equal(payload);
+				expect(response.result.payload.toString(), "payload")
+				.to.deep.equal(payload.toString());
 			});
 		});
 
@@ -130,6 +144,28 @@ describe("A Request helper", function () {
 				.to.equal("application/x-www-form-urlencoded");
 
 				expect(response.result.payload, "payload").to.deep.equal(payload);
+			});
+		});
+
+		describe("with the text content type", function () {
+			var response;
+
+			before(function () {
+				var request = new Request("PUT", "/")
+				.mime("text/plain")
+				.payload("This is a string.");
+
+				return request.inject(server)
+				.then(function (data) {
+					response = data;
+				});
+			});
+
+			it("sends a plain text payload", function () {
+				expect(response.result.headers["content-type"], "header")
+				.to.equal("text/plain");
+
+				expect(response.result.payload, "payload").to.equal("This is a string.");
 			});
 		});
 
