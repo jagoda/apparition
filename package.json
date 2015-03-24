@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "coverage": "gulp coverage",
+    "coverage": "xdg-open coverage/lcov-report/index.html || open coverage/lcov-report/index.html",
     "test": "gulp"
   },
   "name": "apparition",
@@ -10,17 +10,20 @@
   "license": "MIT",
   "main": "lib/apparition",
   "dependencies": {
-    "lodash": "^2.4.1",
-    "q": "^1.0.1"
+    "bluebird": "^2.9.14",
+    "form-urlencoded": "0.0.7",
+    "lodash": "^2.4.1"
   },
   "devDependencies": {
-    "code": "^1.3.0",
+    "chai": "^2.1.2",
     "gulp": "^3.8.8",
+    "gulp-istanbul": "^0.6.0",
+    "gulp-istanbul-enforcer": "^1.0.3",
     "gulp-jscs": "^1.1.2",
     "gulp-jshint": "^1.8.4",
-    "gulp-lab": "^1.0.0",
+    "gulp-mocha": "^2.0.0",
+    "hapi": "^8.4.0",
     "jshint-stylish": "^0.4.0",
-    "lab": "^5.2.1",
-    "sinon": "^1.11.1"
+    "stream-consume": "^0.1.0"
   }
 }

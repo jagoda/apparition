@@ -1,25 +1,21 @@
 "use strict";
-var apparition  = require("..");
-var Code        = require("code");
-var Lab         = require("lab");
-var script      = exports.lab = Lab.script();
+var Apparition = require("..");
 
-var describe = script.describe;
-var expect   = Code.expect;
-var it       = script.it;
+var expect = require("chai").expect;
 
-describe("the apparition library", function () {
-	it("exposes the environment helper", function (done) {
-		expect(apparition, "environment")
-		.to.include({ Environment : require("../lib/Environment") });
-
-		done();
+describe("The Apparition library", function () {
+	it("exposes the environment helper", function () {
+		expect(Apparition, "environment")
+		.to.have.property("Environment", require("../lib/Environment"));
 	});
 
-	it("exposes the properties helper", function (done) {
-		expect(apparition, "properties")
-		.to.include({ Properties : require("../lib/Properties") });
+	it("exposes the properties helper", function () {
+		expect(Apparition, "properties")
+		.to.have.property("Properties", require("../lib/Properties"));
+	});
 
-		done();
+	it("exposes the request helper", function () {
+		expect(Apparition, "request")
+		.to.have.property("Request", require("../lib/Request"));
 	});
 });

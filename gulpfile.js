@@ -1,102 +1,119 @@
 "use strict";
-var fs      = require("fs");
-var gulp    = require("gulp");
-var jscs    = require("gulp-jscs");
-var jshint  = require("gulp-jshint");
-var lab     = require("gulp-lab");
-var path    = require("path");
-var Q       = require("q");
-var stylish = require("jshint-stylish");
+var Bluebird = require("bluebird");
+var Enforcer = require("gulp-istanbul-enforcer");
+var Fs       = require("fs");
+var Gulp     = require("gulp");
+var Istanbul = require("gulp-istanbul");
+var Jscs     = require("gulp-jscs");
+var JsHint   = require("gulp-jshint");
+var Mocha    = require("gulp-mocha");
+var Path     = require("path");
+var Stylish  = require("jshint-stylish");
+
+var consume = require("stream-consume");
 var _       = require("lodash");
 
+Bluebird.promisifyAll(Fs);
+
 var paths = {
-	jscs : path.join(__dirname, ".jscsrc"),
+	jscs : Path.join(__dirname, ".jscsrc"),
 
 	jshint : {
-		source : path.join(__dirname, ".jshintrc"),
-		test   : path.join(__dirname, "test", ".jshintrc")
+		source : Path.join(__dirname, ".jshintrc"),
+		test   : Path.join(__dirname, "test", ".jshintrc")
 	},
 
 	source : [
-		path.join(__dirname, "*.js"),
-		path.join(__dirname, "lib", "**", "*.js")
+		Path.join(__dirname, "*.js"),
+		Path.join(__dirname, "lib", "**", "*.js")
 	],
 
 	test : [
-		path.join(__dirname, "test", "**", "*_spec.js")
+		Path.join(__dirname, "test", "**", "*_spec.js")
 	]
 };
 
 function lint (options, files) {
-	return gulp.src(files)
-	.pipe(jshint(options))
-	.pipe(jshint.reporter(stylish))
-	.pipe(jshint.reporter("fail"));
+	return Gulp.src(files)
+	.pipe(new JsHint(options))
+	.pipe(JsHint.reporter(Stylish))
+	.pipe(JsHint.reporter("fail"));
 }
 
 function loadOptions (path) {
-	return Q.ninvoke(fs, "readFile", path, { encoding : "utf8" })
+	return Fs.readFileAsync(path, { encoding : "utf-8" })
 	.then(function (contents) {
 		return JSON.parse(contents);
 	});
 }
 
 function promisefy (stream) {
-	var deferred = Q.defer();
-
-	stream.once("finish", deferred.resolve.bind(deferred));
-	stream.once("error", deferred.reject.bind(deferred));
-
-	return deferred.promise;
+	return new Bluebird(function (resolve, reject) {
+		stream.once("finish", resolve);
+		stream.once("error", reject);
+		consume(stream);
+	});
 }
 
 function style (options, files) {
-	return gulp.src(files).pipe(jscs(options));
+	return Gulp.src(files).pipe(new Jscs(options));
 }
 
-gulp.task("coverage", function () {
-	var options = {
-		args : "-p -r html -o" + path.join(__dirname, "coverage.html"),
-		opts : { emitLabError : false }
-	};
+Gulp.task("default", [ "test" ]);
 
-	return gulp.src(paths.test).pipe(lab(options));
-});
+Gulp.task("lint", [ "lint-source", "lint-test" ]);
 
-gulp.task("default", [ "test" ]);
-
-gulp.task("lint", [ "lint-source", "lint-test" ]);
-
-gulp.task("lint-source", function () {
+Gulp.task("lint-source", function () {
 	return loadOptions(paths.jshint.source)
 	.then(function (options) {
 		return promisefy(lint(options, paths.source));
 	});
 });
 
-gulp.task("lint-test", function () {
-	return Q.all([
+Gulp.task("lint-test", function () {
+	return Bluebird.join(
 		loadOptions(paths.jshint.source),
-		loadOptions(paths.jshint.test)
-	])
-	.spread(function (source, test) {
-		var options = _.merge(source, test);
-		return promisefy(lint(options, paths.test));
-	});
+		loadOptions(paths.jshint.test),
+		function (source, test) {
+			var options = _.merge(source, test);
+			return promisefy(lint(options, paths.test));
+		}
+	);
 });
 
-gulp.task("style", function () {
+Gulp.task("style", function () {
 	return loadOptions(paths.jscs)
 	.then(function (options) {
 		return promisefy(style(options, paths.source.concat(paths.test)));
 	});
 });
 
-gulp.task("test", [ "lint", "style" ], function () {
+Gulp.task("test", [ "testcases" ], function () {
 	var options = {
-		args : "-p -t 100",
-		opts : { emitLabError : true }
+		coverageDirectory : "coverage",
+		rootDirectory     : __dirname,
+
+		thresholds : {
+			branches   : 100,
+			functions  : 100,
+			lines      : 100,
+			statements : 100
+		}
 	};
 
-	return gulp.src(paths.test).pipe(lab(options));
+	return Gulp.src(".").pipe(new Enforcer(options));
+});
+
+Gulp.task("testcases", [ "lint", "style" ], function (done) {
+	var stream = Gulp.src(paths.source)
+	.pipe(new Istanbul())
+	.pipe(Istanbul.hookRequire())
+	.on("finish", function () {
+		var stream = Gulp.src(paths.test)
+		.pipe(new Mocha())
+		.pipe(Istanbul.writeReports())
+		.on("end", done);
+		consume(stream);
+	});
+	consume(stream);
 });
