@@ -9,6 +9,10 @@
   "author": "Jeff Jagoda <jeffrey.jagoda@gmail.com>",
   "license": "MIT",
   "main": "lib/apparition",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jagoda/apparition"
+  },
   "dependencies": {
     "bluebird": "^2.9.14",
     "form-urlencoded": "0.0.7",

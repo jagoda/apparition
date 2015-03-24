@@ -9,6 +9,10 @@ apparition
 
 	npm install apparition
 
+ + [Properties](#properties)
+ + [Environment](#environment)
+ + [Request](#request)
+
 ## Properties
 
 The `Properties` helper provides a managed way to make changes to an object's
